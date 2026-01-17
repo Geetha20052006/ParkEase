@@ -120,6 +120,12 @@ Stores registered user information.
 | last_login | Last login timestamp |
 
 ---
+## 🔒 Requirements
+
+- Modern web browser (Google Chrome recommended)
+- Camera-enabled device
+- SQLite database support
+---
 
 
 
