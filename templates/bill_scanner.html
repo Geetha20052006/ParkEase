@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block title %}Bill Scanner - ParkEase{% endblock %}
+
+{% block head_scripts %}
+<!-- ZXing library for barcode scanning -->
+<script src="https://unpkg.com/@zxing/library@latest"></script>
+<style>
+    .scanner-container {
+        position: relative;
+        max-width: 100%;
+        overflow: hidden;
+        border-radius: 8px;
+        border: 2px solid #dedede;
+        background-color: #000;
+    }
+    .scanner-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        z-index: 10;
+    }
+    .scan-region {
+        width: 80%;
+        height: 200px;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        border-radius: 10px;
+        box-shadow: 0 0 0 2000px rgba(0, 0, 0, 0.3);
+    }
+    .qr-code-img {
+        max-width: 250px;
+        border: 1px solid #dedede;
+        padding: 10px;
+        border-radius: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="text-center mb-4">
+                <h1 class="display-6">Shopping Bill Scanner</h1>
+                <p class="lead">Scan your shopping bill for free parking exit!</p>
+            </div>
+            <div id="barcode-scanner">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-barcode me-2"></i>Bill Verification</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i> If your shopping bill amount is ₹500 or more, you qualify for a FREE parking exit.
+                        </div>
+                        
+                        <!-- Testing Interface (for ease of testing) -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-secondary text-white">
+                                <h6 class="mb-0">Testing Mode</h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="small">For testing, enter one of these valid barcodes: 123456789, 987654321, 456789123, etc.</p>
+                                <div class="input-group mb-3">
+                                    <input type="text" id="testBarcodeInput" class="form-control" placeholder="Enter barcode number">
+                                    <button class="btn btn-outline-secondary" type="button" id="testVerifyBtn">Verify</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Camera Selection -->
+                        <div class="mb-4">
+                            <label for="cameraSelect" class="form-label fw-bold">Select Camera</label>
+                            <select id="cameraSelect" class="form-select mb-3"></select>
+                        
+                            <!-- Scanner Controls -->
+                            <div class="d-grid gap-2 d-md-flex">
+                                <button id="startScan" class="btn btn-primary btn-lg w-100">
+                                    <i class="fas fa-camera me-2"></i> Start Scanner
+                                </button>
+                                <button id="stopScan" class="btn btn-danger btn-lg w-100 d-none">
+                                    <i class="fas fa-stop me-2"></i> Stop Scanner
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Video Preview -->
+                        <div id="scanner-container" class="scanner-container mb-4 d-none">
+                            <video id="video" width="100%" autoplay></video>
+                            <div class="scanner-overlay">
+                                <div class="scan-region"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Hidden barcode value field -->
+                        <input type="hidden" id="barcodeValue">
+                        
+                        <!-- Scan result will appear here -->
+                        <div id="scanResult" class="mt-4"></div>
+                        
+                        <div class="mt-4 text-end">
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                            </a>
+                            
+        
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/barcode-scanner.js') }}"></script>
+<!-- added from here -->
+<script>
+    let codeReader = null;
+    let selectedDeviceId = null;
+
+    document.addEventListener('DOMContentLoaded', async function () {
+        const startButton = document.getElementById('startScan');
+        const stopButton = document.getElementById('stopScan');
+        const videoElement = document.getElementById('video');
+        const scannerContainer = document.getElementById('scanner-container');
+        const cameraSelect = document.getElementById('cameraSelect');
+
+        // Populate camera list
+        const devices = await ZXing.BrowserMultiFormatReader.listVideoInputDevices();
+        devices.forEach(device => {
+            const option = document.createElement('option');
+            option.value = device.deviceId;
+            option.text = device.label || `Camera ${cameraSelect.length + 1}`;
+            cameraSelect.appendChild(option);
+        });
+
+        startButton.addEventListener('click', () => {
+            selectedDeviceId = cameraSelect.value || devices[0].deviceId;
+            codeReader = new ZXing.BrowserMultiFormatReader();
+
+            codeReader.decodeFromVideoDevice(selectedDeviceId, 'video', (result, err) => {
+                if (result) {
+                    document.getElementById('barcodeValue').value = result.text;
+                    document.getElementById('scanResult').innerHTML = `<div class="alert alert-success">Scanned: ${result.text}</div>`;
+                    verifyBarcode();
+                    stopButton.click(); // auto-stop on successful scan
+                }
+            });
+
+            scannerContainer.classList.remove('d-none');
+            startButton.classList.add('d-none');
+            stopButton.classList.remove('d-none');
+        });
+
+        stopButton.addEventListener('click', () => {
+            if (codeReader) {
+                codeReader.reset();
+            }
+            scannerContainer.classList.add('d-none');
+            startButton.classList.remove('d-none');
+            stopButton.classList.add('d-none');
+        });
+    });
+</script>
+
+ <!-- added till here -->
+
+<script>
+    // Add testing functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const testVerifyBtn = document.getElementById('testVerifyBtn');
+        const testBarcodeInput = document.getElementById('testBarcodeInput');
+        
+        if (testVerifyBtn && testBarcodeInput) {
+            testVerifyBtn.addEventListener('click', function() {
+                const barcodeValue = testBarcodeInput.value.trim();
+                if (barcodeValue) {
+                    document.getElementById('barcodeValue').value = barcodeValue;
+                    verifyBarcode();
+                }
+            });
+            
+            testBarcodeInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    testVerifyBtn.click();
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

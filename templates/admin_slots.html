@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Parking Slots Admin - ParkEase{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">Parking Slots Management</h1>
+    
+    <!-- Parking Statistics -->
+    <div class="card mb-4 dashboard-card" id="parkingStatusContainer">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Parking Status</h5>
+        </div>
+        <div class="card-body">
+            <div class="row text-center">
+                <div class="col-md-4">
+                    <h5>Total Slots</h5>
+                    <div class="statistic-value" id="totalSlots">{{ slots|length }}</div>
+                </div>
+                <div class="col-md-4">
+                    <h5>Available</h5>
+                    <div class="statistic-value text-success" id="availableSlots">{{ slots|selectattr('status', 'equalto', 'Available')|list|length }}</div>
+                </div>
+                <div class="col-md-4">
+                    <h5>Occupied</h5>
+                    <div class="statistic-value text-danger" id="occupiedSlots">{{ slots|selectattr('status', 'equalto', 'Occupied')|list|length }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Parking Grid -->
+    <div class="card dashboard-card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Parking Grid</h5>
+        </div>
+        <div class="card-body">
+            <div class="parking-grid">
+                {% for slot in slots %}
+                <div class="parking-slot slot-{{ slot.status|lower }}" data-bs-toggle="tooltip" title="{% if slot.user %}Occupied by: {{ slot.user.name }} ({{ slot.user.car_number }})<br>Since: {{ slot.user.entry_time }}{% else %}Available{% endif %}">
+                    {{ slot.slot_number }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Occupied Slots Details -->
+    <div class="card mt-4 dashboard-card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Occupied Slots Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Slot Number</th>
+                            <th>User Name</th>
+                            <th>Car Number</th>
+                            <th>Entry Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for slot in slots %}
+                            {% if slot.status == 'Occupied' and slot.user %}
+                            <tr>
+                                <td>{{ slot.slot_number }}</td>
+                                <td>{{ slot.user.name }}</td>
+                                <td>{{ slot.user.car_number }}</td>
+                                <td>{{ slot.user.entry_time }}</td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if slots|selectattr('status', 'equalto', 'Occupied')|list|length == 0 %}
+                        <tr>
+                            <td colspan="4" class="text-center">No occupied slots</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Initialize tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl, {
+                html: true
+            })
+        })
+    });
+</script>
+{% endblock %}

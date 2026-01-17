@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}ParkEase - Smart Parking Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <div class="py-5 text-center">
+        <h1 class="display-4 fw-bold">Welcome to ParkEase</h1>
+        <p class="lead text-muted">The Smart Parking Management System</p>
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
+            {% if not session.get('user_id') %}
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg px-4">Register Now</a>
+            <a href="{{ url_for('login') }}" class="btn btn-outline-secondary btn-lg px-4">Login</a>
+            {% else %}
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg px-4">Go to Dashboard</a>
+            <a href="{{ url_for('parking_entry') }}" class="btn btn-success btn-lg px-4">Park Now</a>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Features Section -->
+    <div class="row g-4 py-5 row-cols-1 row-cols-md-3">
+        <div class="col">
+            <div class="card h-100 dashboard-card">
+                <div class="card-body text-center">
+                    <div class="feature-icon bg-primary bg-gradient text-white rounded-circle p-3 mb-3 mx-auto" style="width: 64px; height: 64px;">
+                        <i class="fas fa-qrcode fs-3"></i>
+                    </div>
+                    <h3 class="fs-4">QR Code Entry & Exit</h3>
+                    <p>Seamless parking experience with QR code-based entry and exit. No more waiting in queues!</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 dashboard-card">
+                <div class="card-body text-center">
+                    <div class="feature-icon bg-primary bg-gradient text-white rounded-circle p-3 mb-3 mx-auto" style="width: 64px; height: 64px;">
+                        <i class="fas fa-wallet fs-3"></i>
+                    </div>
+                    <h3 class="fs-4">Digital Wallet</h3>
+                    <p>Manage your parking expenses with our secure digital wallet system. Easy top-up and automatic payments.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 dashboard-card">
+                <div class="card-body text-center">
+                    <div class="feature-icon bg-primary bg-gradient text-white rounded-circle p-3 mb-3 mx-auto" style="width: 64px; height: 64px;">
+                        <i class="fas fa-shopping-bag fs-3"></i>
+                    </div>
+                    <h3 class="fs-4">Shop & Park Free</h3>
+                    <p>Get free parking when you shop! Simply scan your shopping bill and exit for free if you meet the minimum spend.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- How It Works Section -->
+    <div class="py-5">
+        <h2 class="text-center mb-4">How It Works</h2>
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="badge bg-primary rounded-pill fs-4 mb-3">1</div>
+                    <h5>Register Your Vehicle</h5>
+                    <p>Create an account with your vehicle details and add funds to your wallet.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="badge bg-primary rounded-pill fs-4 mb-3">2</div>
+                    <h5>Scan Entry QR Code</h5>
+                    <p>Use the app to generate and scan an entry QR code at the parking gate.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="badge bg-primary rounded-pill fs-4 mb-3">3</div>
+                    <h5>Shop & Scan Bill</h5>
+                    <p>If you shop, scan your bill to qualify for free parking exit.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="badge bg-primary rounded-pill fs-4 mb-3">4</div>
+                    <h5>Generate Exit QR</h5>
+                    <p>Generate exit QR code and scan at the exit gate to leave.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

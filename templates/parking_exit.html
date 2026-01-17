@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Parking Exit - ParkEase{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">Parking Exit</h1>
+    
+    {% if parking_data %}
+    <!-- Parking Details -->
+    <div class="card mb-4 dashboard-card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Parking Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Parking Slot:</strong> <span class="badge bg-primary">{{ parking_data.slot_number }}</span></p>
+                    <p><strong>Entry Time:</strong> {{ parking_data.entry_time }}</p>
+                    <p><strong>Duration:</strong> {{ parking_data.duration }}</p>
+                </div>
+                <div class="col-md-6">
+                    <div class="alert alert-info">
+                        <h5>Parking Charges: ₹{{ "%.2f"|format(parking_data.charges) }}</h5>
+                        <p class="mb-0"><small>Parking rate: ₹50 per hour</small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Free Exit Check -->
+    <div class="card mb-4 dashboard-card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Payment Options</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Standard Exit</h5>
+                    <p>Pay parking charges from your wallet.</p>
+                    
+                    {% if user.wallet_balance < parking_data.charges %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i> Insufficient wallet balance
+                        <p>Current balance: ₹{{ "%.2f"|format(user.wallet_balance) }}</p>
+                        <p>Required: ₹{{ "%.2f"|format(parking_data.charges) }}</p>
+                        <a href="{{ url_for('wallet') }}" class="btn btn-primary btn-sm">Add Funds</a>
+                    </div>
+                    {% else %}
+                    <input type="hidden" id="parkingCharges" value="{{ parking_data.charges }}">
+                    <input type="hidden" id="isFreeExit" value="false">
+                    <button id="generateExitQRBtn" class="btn btn-primary">
+                        <i class="fas fa-qrcode"></i> Generate Exit QR
+                    </button>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <h5>Free Exit with Shopping Bill</h5>
+                    <p>If you've made purchases over ₹500, you can exit for free by scanning your shopping bill.</p>
+                    <a href="{{ url_for('bill_scanner') }}" class="btn btn-success">
+                        <i class="fas fa-barcode"></i> Scan Shopping Bill
+                    </a>
+                </div>
+            </div>
+            
+            <!-- QR Code will appear here -->
+            <div id="exitQrContainer" class="mt-4"></div>
+        </div>
+    </div>
+    {% else %}
+    <!-- No active parking session -->
+    <div class="alert alert-warning">
+        <h5><i class="fas fa-exclamation-triangle"></i> No Active Parking Session</h5>
+        <p>You don't have any active parking session.</p>
+        <a href="{{ url_for('parking_entry') }}" class="btn btn-primary">Park Now</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

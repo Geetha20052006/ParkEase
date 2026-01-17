@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Wallet - ParkEase{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">Digital Wallet</h1>
+    
+    <div class="row">
+        <!-- Wallet Balance Card -->
+        <div class="col-md-4 mb-4">
+            <div class="card dashboard-card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Wallet Balance</h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="statistic-value mb-3">₹{{ "%.2f"|format(user.wallet_balance) }}</div>
+                    {% if user.wallet_balance < 100 %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i> Minimum balance required: ₹100
+                        </div>
+                    {% else %}
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i> Your wallet has sufficient balance
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Add Funds Card -->
+        <div class="col-md-8 mb-4">
+            <div class="card dashboard-card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Add Funds</h5>
+                </div>
+                <div class="card-body">
+                    <form id="addFundsForm" action="{{ url_for('add_funds') }}" method="post">
+                        <div class="mb-3">
+                            <label for="fundAmount" class="form-label">Amount (₹)</label>
+                            <input type="number" class="form-control" id="fundAmount" name="amount" min="1" step="0.01" placeholder="Enter amount" required>
+                            <div id="amountError" class="form-text text-danger d-none"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="paymentMethod" class="form-label">Payment Method</label>
+                            <select class="form-select" id="paymentMethod" required>
+                                <option value="" selected disabled>Select payment method</option>
+                                <option value="card">Credit/Debit Card</option>
+                                <option value="upi">UPI</option>
+                                <option value="netbanking">Net Banking</option>
+                            </select>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Add Funds</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Transaction History Card -->
+        <div class="col-12 mb-4">
+            <div class="card dashboard-card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Recent Transactions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="transaction-list">
+                        {% if transactions %}
+                            {% for transaction in transactions %}
+                                <div class="transaction-item {{ transaction.type }}">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            {% if transaction.type == 'credit' %}
+                                                <span class="badge bg-success">Credit</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Debit</span>
+                                            {% endif %}
+                                            <span class="ms-2">{{ transaction.description }}</span>
+                                        </div>
+                                        <div>
+                                            {% if transaction.type == 'credit' %}
+                                                <span class="text-success">+₹{{ "%.2f"|format(transaction.amount) }}</span>
+                                            {% else %}
+                                                <span class="text-danger">-₹{{ "%.2f"|format(transaction.amount) }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="text-muted small">
+                                        {{ transaction.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-3">
+                                <p class="text-muted">No transactions yet</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - ParkEase{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">Dashboard</h1>
+    
+    <!-- User Info Card -->
+    <div class="card mb-4 dashboard-card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="card-title">Welcome, {{ user.name }}</h5>
+                    <p class="card-text">
+                        <strong>Car Number:</strong> {{ user.car_number }}<br>
+                        <strong>Mobile:</strong> {{ user.mobile }}<br>
+                        <strong>Wallet Balance:</strong> ₹{{ "%.2f"|format(user.wallet_balance) }}
+                    </p>
+                    {% if user.wallet_balance < 100 %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i> Your wallet balance is below the minimum required amount (₹100).
+                            <a href="{{ url_for('wallet') }}" class="alert-link">Add funds</a>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="{{ url_for('wallet') }}" class="btn btn-primary">
+                        <i class="fas fa-wallet"></i> Manage Wallet
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Action Cards -->
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100 dashboard-card">
+                <div class="card-body text-center">
+                    <i class="fas fa-parking text-primary mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="card-title">Park Your Car</h5>
+                    <p class="card-text">Find parking slot and generate entry QR code.</p>
+                    <a href="{{ url_for('parking_entry') }}" class="btn btn-primary">
+                        <i class="fas fa-car"></i> Park Now
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% if parking_data %}
+        <div class="col-md-4">
+            <div class="card h-100 dashboard-card">
+                <div class="card-body text-center">
+                    <i class="fas fa-barcode text-primary mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="card-title">Scan Shopping Bill</h5>
+                    <p class="card-text">Scan your shopping bill to qualify for free exit.</p>
+                    <a href="{{ url_for('bill_scanner') }}" class="btn btn-primary">
+                        <i class="fas fa-barcode"></i> Scan Bill
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 dashboard-card">
+                <div class="card-body text-center">
+                    <i class="fas fa-sign-out-alt text-primary mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="card-title">Exit Parking</h5>
+                    <p class="card-text">Generate exit QR code to leave the parking.</p>
+                    <a href="{{ url_for('parking_exit') }}" class="btn btn-primary">
+                        <i class="fas fa-sign-out-alt"></i> Exit Now
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-md-4">
+            <div class="card h-100 dashboard-card">
+                <div class="card-body text-center">
+                    <i class="fas fa-info-circle text-primary mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="card-title">No Active Parking</h5>
+                    <p class="card-text">You don't have any active parking session. Use the "Park Now" button to start parking.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 dashboard-card">
+                <div class="card-body text-center">
+                    <i class="fas fa-barcode text-primary mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="card-title">Scan Shopping Bill</h5>
+                    <p class="card-text">Scan your shopping bill to prepare for free exit after parking.</p>
+                    <a href="{{ url_for('bill_scanner') }}" class="btn btn-primary">
+                        <i class="fas fa-barcode"></i> Scan Bill
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Current Parking Status (if active) -->
+    {% if parking_data %}
+    <div class="card mt-4 dashboard-card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Current Parking Status</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Parking Slot:</strong> <span class="badge bg-primary">{{ parking_data.slot_number }}</span></p>
+                    <p><strong>Entry Time:</strong> {{ parking_data.entry_time }}</p>
+                    <p><strong>Duration:</strong> {{ parking_data.duration }}</p>
+                </div>
+                <div class="col-md-6">
+                    <div class="alert alert-info">
+                        <h5>Current Charges: ₹{{ "%.2f"|format(parking_data.charges) }}</h5>
+                        <p class="mb-0"><small>Parking rate: ₹50 per hour</small></p>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('parking_exit') }}" class="btn btn-success">
+                            <i class="fas fa-sign-out-alt"></i> Exit Parking
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

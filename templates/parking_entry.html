@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Parking Entry - ParkEase{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">Parking Entry</h1>
+    
+    <!-- Wallet Status Check -->
+    {% if user.wallet_balance < 100 %}
+    <div class="alert alert-danger mb-4">
+        <h5><i class="fas fa-exclamation-circle"></i> Insufficient Wallet Balance</h5>
+        <p>You need a minimum balance of ₹100 to enter the parking area.</p>
+        <p>Your current balance: ₹{{ "%.2f"|format(user.wallet_balance) }}</p>
+        <a href="{{ url_for('wallet') }}" class="btn btn-primary">Add Funds</a>
+    </div>
+    {% else %}
+    
+    <!-- Entry Instructions -->
+    <div class="card mb-4 dashboard-card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">How to Enter Parking</h5>
+        </div>
+        <div class="card-body">
+            <ol class="mb-0">
+                <li>Click the "Generate QR Code" button below</li>
+                <li>Wait for the system to assign you a parking slot</li>
+                <li>A unique QR code will be generated for entry</li>
+                <li>Show this QR code at the parking entry gate</li>
+                <li>Once scanned, proceed to your assigned parking slot</li>
+            </ol>
+        </div>
+    </div>
+    
+    <!-- Generate QR Button -->
+    <div class="card dashboard-card">
+        <div class="card-body text-center">
+            <h3 class="mb-4">Ready to Park?</h3>
+            <p>Your wallet balance: ₹{{ "%.2f"|format(user.wallet_balance) }}</p>
+            <button id="generateEntryQRBtn" class="btn btn-primary btn-lg">
+                <i class="fas fa-qrcode"></i> Generate Entry QR Code
+            </button>
+            
+            <!-- QR Code will appear here -->
+            <div id="qrContainer" class="mt-4"></div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

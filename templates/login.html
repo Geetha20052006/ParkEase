@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - ParkEase{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card card-form my-5">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="my-2">Login</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" action="{{ url_for('login') }}">
+                        <div class="mb-3">
+                            <label for="car_number" class="form-label">Car Number</label>
+                            <input type="text" class="form-control" id="car_number" name="car_number" placeholder="Enter your car registration number" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">Login</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center bg-light py-3">
+                    <p class="mb-0">Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
